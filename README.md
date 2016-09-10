@@ -2,9 +2,9 @@
 
 ## What is it?
 
-IngewikkeldWrapperBundle is a simple Symfony2 bundle to wrap your old legacy symfony 1 application. This allows you to gradually refactor your old symfony 1 code with spankin' new Symfony2 code.
+IngewikkeldWrapperBundle is a simple Symfony2/3 bundle to wrap your old legacy Symfony 1 application. This allows you to gradually refactor your old symfony 1 code with spankin' new Symfony2 code.
 
-IngewikkeldWrapperBundle works with a fallback route. All routes that are not caught by your Symfony2 code are routed into the IngewikkeldWrapperBundle, which in turn bootstraps your symfony 1 project.
+IngewikkeldWrapperBundle works with a fallback route. All routes that are not caught by your Symfony2/3 code are routed into the IngewikkeldWrapperBundle, which in turn bootstraps your symfony 1 project.
 
 **Note**: While this bundle can be very useful, it is not recommended to use it for too long. You *are* running two different frameworks for each request that goes through this bundle, meaning there's two frameworks adding an overhead to each request. If you have the possibility, look into caching the output of your legacy code in Symfony2.
 
@@ -55,29 +55,36 @@ Of course, you can just download the zip file from [Github](https://github.com/I
 
 Before the Ingewikkeld namespace can be loaded, we need to set up the autoloader to actually load the namespace. For this to work, you need to edit the *app/autoload.php* file. In the $loader->registerNamespaces() call, you need to add the Ingewikkeld namespace, like this:
 
-    $loader->registerNamespaces(array(
-		// ...
-        'Ingewikkeld'      => __DIR__.'/../vendor/bundles',
-    ));
+```php
+$loader->registerNamespaces(array(
+	// ...
+	'Ingewikkeld'      => __DIR__.'/../vendor/bundles',
+));
+```
 
 ### 4. Enable the bundle
 
 Enable the bundle in the AppKernel (*app/AppKernel.php*). In the registerBundles() method, add the WrapperBundle to the $bundles array:
 
-       $bundles = array(
-			// ...
-            new Ingewikkeld\WrapperBundle\IngewikkeldWrapperBundle(),
-        );
+```php
+$bundles = array(
+    // ...
+    new Ingewikkeld\WrapperBundle\IngewikkeldWrapperBundle(),
+);
+```
+
 ### 5. Configure your legacy project
 
 Put your legacy project in your *app/* directory. For my first project, I put my whole project into the *app/legacy/* directory. Now, add some configuration values to *app/config/config.yml* to set up the WrapperBundle to serve pages from your legacy symfony 1 project:
 
-    parameters:
-        wrapper_legacypath: legacy # directory inside app/ where your project is located
-        wrapper_app: frontend # app to load
-        wrapper_env: prod # environment to load
-        wrapper_debug: false # whether debug is on or not
-        wrapper_version: 1.4 # Symfony version of the legacy project you are wrapping in this bundle 
+```yaml
+parameters:
+    wrapper_legacypath: legacy # directory inside app/ where your project is located
+    wrapper_app: frontend # app to load
+    wrapper_env: prod # environment to load
+    wrapper_debug: false # whether debug is on or not
+    wrapper_version: 1.4 # Symfony version of the legacy project you are wrapping in this bundle 
+```
 
 ### 6. Copy your assets to the document root
 
@@ -87,10 +94,12 @@ All files that need to be available in the document root need to be copied there
 
 At the bottom of your *app/config/routing.yml* file, add the following:
 
+```yaml
 IngewikkeldWrapperBundle:
     resource: "@IngewikkeldWrapperBundle/Controller/"
     type:     annotation
     prefix:   /
+```
 
 This will ensure the wrapper route will catch all requests that are not caught by any other route.
 
